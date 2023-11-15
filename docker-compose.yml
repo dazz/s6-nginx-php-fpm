@@ -1,0 +1,14 @@
+version: '3.7'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+      target: dev
+    ports:
+      - "8081:80"
+    environment:
+      APP_ENV: "dev"
+      S6_VERBOSITY: "4" # default is 1, goes from 1-5
+    volumes:
+      - ./app:/var/www/html/:cached
