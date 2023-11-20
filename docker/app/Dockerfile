@@ -18,11 +18,15 @@ ARG NGINX_VERSION=1.24.0-r7
 ARG WORKDIR=/var/www/html
 ARG S6_TMP_PATH=/opt/s6-overlay
 
-# install nginx
+# install php extensions installer
+COPY --from=mlocati/php-extension-installer:2.1.64 /usr/bin/install-php-extensions /usr/local/bin/
+# install nginx and packages
 # now we got both nginx and php-fpm installed
 RUN set -eux; \
     apk add --no-cache \
       nginx=${NGINX_VERSION} \
+    && install-php-extensions  \
+          opcache \
     ;
 
 # setup s6-overlay
@@ -31,14 +35,6 @@ ENV S6_VERBOSITY=5
 COPY --from=s6-overlay ${S6_TMP_PATH} /
 # copy files to start, run, terminate and finish the processes in the container with S6
 COPY --chmod=755 ./docker/app/root /
-
-# install php extensions
-COPY --from=mlocati/php-extension-installer:2.1.64 /usr/bin/install-php-extensions /usr/local/bin/
-
-RUN set -eux; \
-    install-php-extensions  \
-      opcache \
-    ;
 
 WORKDIR ${WORKDIR}
 EXPOSE 80

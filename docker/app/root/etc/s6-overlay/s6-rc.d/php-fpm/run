@@ -1,2 +1,3 @@
 #!/command/execlineb -P
-/usr/local/sbin/php-fpm -F
+with-contenv
+/usr/local/sbin/php-fpm -F -O

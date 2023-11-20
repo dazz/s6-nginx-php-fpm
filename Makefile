@@ -1,15 +1,12 @@
 PHONY: *
 
-install: symfony-demo up
-
-symfony-demo:
-	git clone https://github.com/symfony/demo.git app
+install: up
 
 up: down
-	docker compose up --build -d
+	docker compose up --build -d app
 
 down:
-	docker compose down --remove-orphans
+	docker compose down app --remove-orphans
 
 stop:
 	docker compose stop
@@ -33,3 +30,6 @@ alpine:
 
 php-fpm:
 	docker run --rm -it -d --name php-fpm php:8.2-fpm-alpine
+
+tree:
+	tree --gitignore -C
