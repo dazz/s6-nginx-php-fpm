@@ -44,7 +44,8 @@ CMD []
 ENTRYPOINT ["/init"]
 
 FROM base as dev
-
 COPY --from=composer:2.6.5 /usr/bin/composer /usr/bin/composer
 RUN set -eux; \
-    install-php-extensions xdebug
+    apk add --no-cache git \
+#    && install-php-extensions xdebug
+;

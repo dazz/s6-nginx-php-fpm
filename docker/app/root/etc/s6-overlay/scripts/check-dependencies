@@ -1,0 +1,10 @@
+#!/command/with-contenv sh
+
+# Check if APP_DEBUG is set and its value is 1
+if [ -z "$APP_DEBUG" ] || [ "$APP_DEBUG" != "1" ]; then
+    echo "check-dependencies: info: APP_DEBUG is not set or is not 1. Exiting..."
+    exit 0
+fi
+
+# Continue with the rest of your script or command here
+composer check-platform-reqs

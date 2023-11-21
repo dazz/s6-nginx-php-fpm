@@ -4,15 +4,16 @@ services:
     build:
       context: .
       dockerfile: docker/app/Dockerfile
-      target: base
+      target: dev
     ports:
       - "8085:80"
     environment:
       APP_ENV: "dev"
+      APP_DEBUG: 1
       S6_VERBOSITY: 5 # default is 1, goes from 1-5
       S6_KEEP_ENV: 1 # default is 0, keeps the environment variables
     volumes:
-      - ./app:/var/www/html/:cached
+      - ./app:/var/www/html
 
   serversideup:
     build:

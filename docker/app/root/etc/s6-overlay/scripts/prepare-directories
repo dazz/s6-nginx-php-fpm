@@ -1,0 +1,13 @@
+#!/command/with-contenv sh
+
+mkdir -p /var/www/html/var/cache
+mkdir -p /var/www/html/var/log
+
+# Make the ownership inheritable
+chmod g+s /var/www/html/
+
+# Make folders writable by the www-data user used by the app processes
+chmod g+w /var/www/html/var/cache/
+chmod g+w /var/www/html/var/log/
+
+chown -R www-data:www-data /var/www/html
