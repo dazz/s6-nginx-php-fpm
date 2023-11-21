@@ -33,3 +33,19 @@ php-fpm:
 
 tree:
 	tree --gitignore -C
+
+# run it like this: make create-oneshot name=something
+create-oneshot:
+	mkdir -p docker/app/root/etc/s6-overlay/s6-rc.d/$(name)/dependencies.d
+	touch docker/app/root/etc/s6-overlay/s6-rc.d/$(name)/dependencies.d/base
+	echo "/etc/s6-overlay/scripts/$(name)" >| docker/app/root/etc/s6-overlay/s6-rc.d/$(name)/up
+	echo "oneshot" >| docker/app/root/etc/s6-overlay/s6-rc.d/$(name)/type
+	echo "#!/bin/sh" >| docker/app/root/etc/s6-overlay/scripts/$(name)
+	chmod +x docker/app/root/etc/s6-overlay/scripts/$(name)
+
+# run it like this: make create-longrun name=something
+create-longrun:
+	mkdir -p docker/app/root/etc/s6-overlay/s6-rc.d/$(name)/dependencies.d
+	touch docker/app/root/etc/s6-overlay/s6-rc.d/$(name)/dependencies.d/base
+	echo "#!/command/execlineb -P"  >| docker/app/root/etc/s6-overlay/s6-rc.d/$(name)/run
+	echo "longrun" >| docker/app/root/etc/s6-overlay/s6-rc.d/$(name)/type
