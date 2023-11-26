@@ -25,8 +25,12 @@ COPY --from=mlocati/php-extension-installer:2.1.64 /usr/bin/install-php-extensio
 RUN set -eux; \
     apk add --no-cache \
       nginx=${NGINX_VERSION} \
+    && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
     && install-php-extensions  \
-          opcache \
+#      mysqli \
+      pdo_mysql \
+      opcache \
+    && apk del --no-network .build-deps \
     ;
 
 # setup s6-overlay
@@ -44,8 +48,13 @@ CMD []
 ENTRYPOINT ["/init"]
 
 FROM base as dev
+ARG UID
+ARG GID
 COPY --from=composer:2.6.5 /usr/bin/composer /usr/bin/composer
 RUN set -eux; \
-    apk add --no-cache git \
-#    && install-php-extensions xdebug
+    apk add --no-cache git shadow \
+#    && install-php-extensions xdebug \
+    && groupmod -g ${GID} www-data \
+    && usermod -u ${UID} www-data \
+    && chown -R www-data:www-data ${WORKDIR} \
 ;

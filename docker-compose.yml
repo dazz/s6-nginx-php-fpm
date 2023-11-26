@@ -5,6 +5,8 @@ services:
       context: .
       dockerfile: docker/app/Dockerfile
       target: dev
+    depends_on:
+      - db
     ports:
       - "8085:80"
     environment:
@@ -15,15 +17,36 @@ services:
     volumes:
       - ./app:/var/www/html
 
-  serversideup:
-    build:
-      context: .
-      dockerfile: docker/serversideup/Dockerfile
-      target: dev
-    ports:
-      - "8081:80"
+  db:
+    image: mysql:5.7.43
+#    restart: always
     environment:
-      APP_ENV: "dev"
-      S6_VERBOSITY: "4" # default is 1, goes from 1-5
+      MYSQL_DATABASE: 'app'
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: 'app'
+      # You can use whatever password you like
+      MYSQL_PASSWORD: '!ChangeMe!'
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
     volumes:
-      - ./app:/var/www/html/:cached
+      - my-db:/var/lib/mysql
+
+volumes:
+    my-db:
+
+#  serversideup:
+#    build:
+#      context: .
+#      dockerfile: docker/serversideup/Dockerfile
+#      target: dev
+#    ports:
+#      - "8081:80"
+#    environment:
+#      APP_ENV: "dev"
+#      S6_VERBOSITY: "4" # default is 1, goes from 1-5
+#    volumes:
+#      - ./app:/var/www/html/:cached

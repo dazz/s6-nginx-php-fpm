@@ -1,0 +1,2 @@
+#!/bin/sh
+echo "migration: info: running $0"

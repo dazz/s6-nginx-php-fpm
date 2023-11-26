@@ -7,4 +7,15 @@ if [ -z "$APP_DEBUG" ] || [ "$APP_DEBUG" != "1" ]; then
 fi
 
 # Continue with the rest of your script or command here
-composer check-platform-reqs
+# Check if the composer binary exists
+if command -v composer >/dev/null 2>&1; then
+    # Composer is installed, run composer install
+    echo "check-dependencies: info: Composer found. Checking dependencies."
+    cd /var/www/html
+    composer check-platform-reqs
+else
+    # Composer not found
+    echo "check-dependencies: info: Composer not found. Please install Composer before running this script."
+    exit 0
+fi
+exit 0

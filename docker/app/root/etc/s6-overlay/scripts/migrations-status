@@ -1,0 +1,4 @@
+#!/command/with-contenv sh
+cd /var/www/html
+php bin/console doctrine:migrations:status > /dev/stderr
+echo "migrations-status: info: running $0"

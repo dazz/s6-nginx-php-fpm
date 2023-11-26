@@ -1,12 +1,25 @@
 PHONY: *
 
+UID = $(shell id -u)
+GID = $(shell id -g)
+
 install: up
 
+setup-db:
+	docker compose exec app php bin/console doctrine:database:create --if-not-exists
+	docker compose exec app php bin/console doctrine:schema:create --if-not-exists
+	docker compose exec app php bin/console doctrine:fixtures:load
+	#docker compose exec app php bin/console doctrine:migrations:migrate --no-interaction
+
 up: down
-	docker compose up --build -d app
+	docker compose build --build-arg UID=$(UID) --build-arg GID=$(GID)
+	docker compose up -d
 
 down:
-	docker compose down app --remove-orphans
+	docker compose down app
+
+cli:
+	docker compose exec app /bin/sh
 
 stop:
 	docker compose stop
@@ -35,7 +48,7 @@ tree:
 	tree --gitignore -C
 
 # run it like this: make create-oneshot name=something
-create-oneshot:
+s6-oneshot:
 	mkdir -p docker/app/root/etc/s6-overlay/s6-rc.d/$(name)/dependencies.d
 	touch docker/app/root/etc/s6-overlay/s6-rc.d/$(name)/dependencies.d/base
 	echo "/etc/s6-overlay/scripts/$(name)" >| docker/app/root/etc/s6-overlay/s6-rc.d/$(name)/up
@@ -44,7 +57,7 @@ create-oneshot:
 	chmod +x docker/app/root/etc/s6-overlay/scripts/$(name)
 
 # run it like this: make create-longrun name=something
-create-longrun:
+s6-longrun:
 	mkdir -p docker/app/root/etc/s6-overlay/s6-rc.d/$(name)/dependencies.d
 	touch docker/app/root/etc/s6-overlay/s6-rc.d/$(name)/dependencies.d/base
 	echo "#!/command/execlineb -P"  >| docker/app/root/etc/s6-overlay/s6-rc.d/$(name)/run
