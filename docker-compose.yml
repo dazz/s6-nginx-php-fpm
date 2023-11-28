@@ -12,7 +12,8 @@ services:
     environment:
       APP_ENV: "dev"
       APP_DEBUG: 1
-      S6_VERBOSITY: 1 # default is 1, goes from 1-5
+      APP_RUN_MIGRATION: 'Version20231126081936'
+      S6_VERBOSITY: 2 # default is 1, goes from 1-5
       S6_KEEP_ENV: 1 # default is 0, keeps the environment variables
     volumes:
       - ./app:/var/www/html
