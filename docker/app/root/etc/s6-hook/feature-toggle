@@ -1,0 +1,38 @@
+#!/command/with-contenv sh
+
+if v=`printcontenv S6_VERBOSITY` && eltest "$v" =~ '^[[:digit:]]+$' ; then : ; else
+  v=2
+fi
+
+if test $v -ge 2 ; then
+    echo "feature-toggle: info: disabling features that are not enabled" 1>&2
+fi
+
+# Read environment variable and default to "false" if not set
+INIT_MIGRATIONS="${FEATURE_MIGRATIONS_ENABLED:-false}"
+INIT_SECURITY_CHECK="${FEATURE_SECURITY_CHECK_ENABLED:-false}"
+SVC_SCHEDULER="${FEATURE_SCHEDULER_ENABLED:-false}"
+
+# Define a space-separated list of feature toggles (since arrays are not supported in sh)
+# the feature name is the upper SNAKE_CASE version of the feature directory name in lower kebab-case
+features="INIT_MIGRATIONS INIT_SECURITY_CHECK SVC_SCHEDULER"
+
+# Iterate through each feature toggle
+for feature in $features; do
+    # Get the value of the environment variable, default to "false" if not set
+    is_enabled=$(eval echo \${$feature:-false})
+
+    # Convert the feature name to lowercase and replace underscores with hyphens
+    feature_file=$(echo "$feature" | tr 'A-Z' 'a-z' | tr '_' '-')
+
+    # Check if the feature is enabled
+    if [ "$is_enabled" = "true" ]; then
+        echo "feature-toggle: info: $feature is enabled! The service name would be: $feature_file"
+        touch "/etc/s6-overlay/s6-rc.d/user/contents.d/$feature_file"
+    else
+        echo "feature-toggle: info: $feature is disabled. Deleting service: $feature_file"
+        rm -f "/etc/s6-overlay/s6-rc.d/user/contents.d/$feature_file"
+    fi
+done
+
+exit 0

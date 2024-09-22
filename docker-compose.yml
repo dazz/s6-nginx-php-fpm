@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: docker/app/Dockerfile
-      target: dev
+      target: prod
     depends_on:
       - db
     ports:
@@ -12,9 +12,12 @@ services:
     environment:
       APP_ENV: "dev"
       APP_DEBUG: 1
-      APP_RUN_MIGRATION: 'Version20231126081936'
       S6_VERBOSITY: 2 # default is 1, goes from 1-5
-      S6_KEEP_ENV: 1 # default is 0, keeps the environment variables
+      S6_KEEP_ENV: 0 # default is 0, keeps the environment variables
+      S6_STAGE2_HOOK: /etc/s6-hook/feature-toggle
+      FEATURE_MIGRATIONS_ENABLED: "false"
+      FEATURE_SCHEDULER_ENABLED: "false"
+      FEATURE_SECURITY_CHECK_ENABLED: "true"
     volumes:
       - ./app:/var/www/html
 
@@ -38,16 +41,3 @@ services:
 
 volumes:
     my-db:
-
-#  serversideup:
-#    build:
-#      context: .
-#      dockerfile: docker/serversideup/Dockerfile
-#      target: dev
-#    ports:
-#      - "8081:80"
-#    environment:
-#      APP_ENV: "dev"
-#      S6_VERBOSITY: "4" # default is 1, goes from 1-5
-#    volumes:
-#      - ./app:/var/www/html/:cached

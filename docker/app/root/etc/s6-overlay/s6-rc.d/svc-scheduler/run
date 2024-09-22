@@ -1,0 +1,4 @@
+#!/command/execlineb -P
+
+with-contenv
+php /var/www/html/bin/console messenger:consume scheduler_default --time-limit=300 --memory-limit=128M --limit=10 --env=`printcontenv APP_ENV` --quiet
